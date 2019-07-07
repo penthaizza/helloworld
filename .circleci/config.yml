@@ -1,19 +1,14 @@
-version: 2.1
 orbs:
-  aws-ecr: circleci/aws-ecr@4.0.1
-  # aws-ecs: circleci/aws-ecs@0.0.8
+  aws-ecr: circleci/aws-ecr@6.1.0
+version: 2.1
 workflows:
-  build-and-deploy:
+  build_and_push_image:
     jobs:
-      - aws-ecr/build_and_push_image:
+      - aws-ecr/build-and-push-image:
           account-url: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+          aws-access-key-id: "${AWS_ACCESS_KEY_ID}"
+          aws-secret-access-key: "${AWS_SECRET_ACCESS_KEY}"
+          dockerfile: Dockerfile
+          region: "${AWS_DEFAULT_REGION}"
           repo: "${AWS_RESOURCE_NAME_PREFIX}"
-          region: ${AWS_DEFAULT_REGION}
           tag: "${CIRCLE_SHA1}"
-      # - aws-ecs/deploy-service-update:
-      #     requires:
-      #       - aws-ecr/build_and_push_image
-      #     aws-region: ${AWS_DEFAULT_REGION}
-      #     family: "${AWS_RESOURCE_NAME_PREFIX}-service"
-      #     cluster-name: "${AWS_RESOURCE_NAME_PREFIX}-cluster"
-      #     container-image-name-updates: "container=${AWS_RESOURCE_NAME_PREFIX}-service,tag=${CIRCLE_SHA1}"
