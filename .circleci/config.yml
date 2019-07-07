@@ -2,7 +2,7 @@ orbs:
   aws-ecr: circleci/aws-ecr@6.1.0
 version: 2.1
 workflows:
-  build_and_push_image:
+  build-and-push-image:
     jobs:
       - aws-ecr/build-and-push-image:
           account-url: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
