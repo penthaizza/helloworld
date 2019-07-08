@@ -24,8 +24,8 @@ jobs:
       - run: 
           name : Setup Environments AWS-CLI
           command: |
-            sudo pip install awscli
-            sudo pip install --upgrade awscli
+            pip install awscli
+            pip install --upgrade awscli
 workflows:
   version: 2
   build-test-deploy:
