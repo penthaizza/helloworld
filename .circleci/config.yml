@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: Add Dependencies
-          command: apk add --no-cache curl git python
+          command: apk add --no-cache --update curl git python py-pip
       - run:
           name: Install & Build Helloworld
           command: npm install
