@@ -1,9 +1,13 @@
 version: 2
 jobs:
   build:
-    machine: true 
+    docker:
+      - image: node:10-alpine
     steps:
       - checkout
+      - run:
+          name: Install & Build Helloworld
+          command: npm install
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
