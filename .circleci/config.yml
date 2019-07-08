@@ -1,14 +1,28 @@
-orbs:
-  aws-ecr: circleci/aws-ecr@6.1.0
-version: 2.1
+version: 2
+jobs:
+  build:
+    machine: true 
+    steps:
+      - checkout
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="18.09.7"
+            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
+      - run: 
+          name : Setup Environments AWS-CLI
+          command: |
+            cat /etc/os-release
 workflows:
-  build-and-push-image:
-    jobs:
-      - aws-ecr/build-and-push-image:
-          account-url: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
-          aws-access-key-id: "${AWS_ACCESS_KEY_ID}"
-          aws-secret-access-key: "${AWS_SECRET_ACCESS_KEY}"
-          dockerfile: Dockerfile
-          region: "${AWS_DEFAULT_REGION}"
-          repo: "${AWS_RESOURCE_NAME_PREFIX}"
-          tag: "${CIRCLE_SHA1}"
+  version: 2
+    build-test-deploy:
+      jobs:
+        - build:
+            filters:
+              branches:
+                only: master
+
+          
