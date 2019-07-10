@@ -25,32 +25,7 @@ jobs:
             FRONTEND_COMMIT=DEF
             if [ $BACKEND_COMMIT = $LASTEST_COMMIT ];
                 then
-                  - run:
-                      name: Install Docker client
-                      command: |
-                        set -x
-                        VER="18.09.7"
-                        curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
-                        tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-                        mv /tmp/docker/* /usr/bin
-                  - run: 
-                      name: Setup Environments AWS-CLI
-                      command: |
-                        pip install awscli
-                        pip install --upgrade awscli
-                  - run:
-                      name: Setup configure AWS
-                      command: |
-                        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-                        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-                        aws configure set default.region $AWS_DEFAULT_REGION
-                  - run:
-                      name: Build & Push to ECR
-                      command: |
-                        $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-                        docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX:$(git rev-parse --short HEAD) .
-                        docker tag $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX:$(git rev-parse --short HEAD) $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX:latest
-                        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX
+                  echo "Backend is latest commit"
             elif [ $FRONTEND_COMMIT = $LASTEST_COMMIT ];
                 then
                   echo "Frontend is latest commit"
