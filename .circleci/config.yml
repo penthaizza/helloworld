@@ -1,20 +1,25 @@
+nodeimage: &nodeimage
+  docker:
+    - image: node:alpine
+dependencies: &dependencies
+  run:
+    name: Add Dependencies
+    command: apk add --no-cache --update curl git python py-pip
+
 version: 2.1
 jobs:
-  build:
-    docker:
-      - image: node:10-alpine
+  check-commit-dev:
+    <<: *nodeimage
     steps:
       - checkout
-      - run:
-          name: Add Dependencies
-          command: apk add --no-cache --update curl git python py-pip
+      - *dependencies
       - run:
           name: Install & Build Helloworld
           command: npm install
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: test if else in circleci
+          name: Check if else for choose script to deploy
           command: |
             set -e
             # LASTEST_COMMIT=$(git rev-parse HEAD)
@@ -37,13 +42,47 @@ jobs:
                 echo "no folder of latest commit"
                 exit 0;
             fi
+  check-commit-stagging:
+    <<: *nodeimage
+    steps:
+      - checkout
+      - *dependencies
+      - run:
+          name: Install & Build Helloworld
+          command: npm install
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Check if else for choose script to deploy
+          command: |
+            set -e
+            # LASTEST_COMMIT=$(git rev-parse HEAD)
+            # BACKEND_COMMIT=$(git log -1 --format=format:%H --full-diff ./backend)
+            # FRONTEND_COMMIT=$(git log -1 --format=format:%H --full-diff ./frontend)
+            LASTEST_COMMIT=123456
+            BACKEND_COMMIT=000000
+            FRONTEND_COMMIT=123456
+            if [ $BACKEND_COMMIT = $LASTEST_COMMIT ];
+                then
+                  echo "Backend is latest commit stagging"
+            elif [ $FRONTEND_COMMIT = $LASTEST_COMMIT ];
+                then
+                  echo "Frontend is latest commit stagging"
+            else
+                echo "no folder of latest commit stagging"
+                exit 0;
+            fi
 workflows:
   version: 2
-  build-test-deploy:
+  deploy:
     jobs:
-      - build:
+      - check-commit-dev:
           filters:
             branches:
               only: master
+      - check-commit-stagging:
+          filtes:
+            branches:
+              only: dev
 
           
