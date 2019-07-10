@@ -1,6 +1,6 @@
 nodeimage: &nodeimage
   docker:
-    - image: node:alpine
+    - image: node:10-alpine
 dependencies: &dependencies
   run:
     name: Add Dependencies
