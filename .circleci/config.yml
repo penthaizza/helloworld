@@ -27,7 +27,6 @@ jobs:
                 then
                   echo "Backend is latest commit"
                   chmod +x backend-dev.sh
-                  cd ..
                   ./backend-dev.sh
             elif [ $FRONTEND_COMMIT = $LASTEST_COMMIT ];
                 then
