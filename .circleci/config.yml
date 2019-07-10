@@ -28,7 +28,7 @@ jobs:
                   echo "Backend is latest commit"
                   pwd
                   ls -a
-                  sudo chmod +x backend-dev.sh
+                  chmod +x backend-dev.sh
                   bash backend-dev.sh
             elif [ $FRONTEND_COMMIT = $LASTEST_COMMIT ];
                 then
