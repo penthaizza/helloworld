@@ -81,8 +81,6 @@ workflows:
             branches:
               only: master
       - check-commit-stagging:
-          filtes:
+          filters:
             branches:
-              only: dev
-
-          
+              only: dev 
