@@ -22,22 +22,19 @@ jobs:
           name: Check if else for choose script to deploy
           command: |
             set -e
-            # LASTEST_COMMIT=$(git rev-parse HEAD)
-            # BACKEND_COMMIT=$(git log -1 --format=format:%H --full-diff ./backend)
-            # FRONTEND_COMMIT=$(git log -1 --format=format:%H --full-diff ./frontend)
-            LASTEST_COMMIT=DEF
-            BACKEND_COMMIT=ABC
-            FRONTEND_COMMIT=DEF
+            LASTEST_COMMIT=$(git rev-parse HEAD)
+            BACKEND_COMMIT=$(git log -1 --format=format:%H --full-diff ./backend)
+            FRONTEND_COMMIT=$(git log -1 --format=format:%H --full-diff ./frontend)
             if [ $BACKEND_COMMIT = $LASTEST_COMMIT ];
                 then
                   echo "Backend is latest commit"
             elif [ $FRONTEND_COMMIT = $LASTEST_COMMIT ];
                 then
                   echo "Frontend is latest commit"
-                  pwd
-                  ls -a
-                  chmod +x frontend-dev.sh
-                  sh frontend-dev.sh
+                  # pwd
+                  # ls -a
+                  # chmod +x frontend-dev.sh
+                  # sh frontend-dev.sh
             else
                 echo "no folder of latest commit"
                 exit 0;
@@ -56,12 +53,9 @@ jobs:
           name: Check if else for choose script to deploy
           command: |
             set -e
-            # LASTEST_COMMIT=$(git rev-parse HEAD)
-            # BACKEND_COMMIT=$(git log -1 --format=format:%H --full-diff ./backend)
-            # FRONTEND_COMMIT=$(git log -1 --format=format:%H --full-diff ./frontend)
-            LASTEST_COMMIT=123456
-            BACKEND_COMMIT=000000
-            FRONTEND_COMMIT=123456
+            LASTEST_COMMIT=$(git rev-parse HEAD)
+            BACKEND_COMMIT=$(git log -1 --format=format:%H --full-diff ./backend)
+            FRONTEND_COMMIT=$(git log -1 --format=format:%H --full-diff ./frontend)
             if [ $BACKEND_COMMIT = $LASTEST_COMMIT ];
                 then
                   echo "Backend is latest commit stagging"
