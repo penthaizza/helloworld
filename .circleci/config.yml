@@ -27,7 +27,7 @@ jobs:
             # FRONTEND_COMMIT=$(git log -1 --format=format:%H --full-diff ./frontend)
             LASTEST_COMMIT=abc
             BACKEND_COMMIT=def
-            FRONTEND_COMMITabc
+            FRONTEND_COMMIT=abc
             if [ $BACKEND_COMMIT = $LASTEST_COMMIT ];
                 then
                   echo "Backend is latest commit"
