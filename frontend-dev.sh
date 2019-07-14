@@ -46,20 +46,20 @@ ecsconfigure(){
     echo "Configure the Amazon ECS CLI"
     ecs-cli configure --cluster $AWS_RESOURCE_NAME_PREFIX --region $AWS_DEFAULT_REGION --default-launch-type FARGATE --config-name $AWS_RESOURCE_NAME_PREFIX
     ecs-cli configure profile --access-key $AWS_ACCESS_KEY_ID --secret-key $AWS_SECRET_ACCESS_KEY --profile-name $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli up --force
-    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service up --file ./docker-compose.yml --ecs-params ./ecs-params.yml --create-log-groups --cluster-config $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli logs --cluster-config $AWS_RESOURCE_NAME_PREFIX --follow --cluster-config $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service scale 2 --cluster-config $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
-
-    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service down --cluster-config $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli down --force --cluster-config $AWS_RESOURCE_NAME_PREFIX
 }
  
 ecsdeploy(){
-    ecs-cli compose up --create-log-groups --cluster-config $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli ps
+    ecs-cli up --force
+    ecs-cli compose service up --project-name $AWS_RESOURCE_NAME_PREFIX --file docker-compose.yml --ecs-params ecs-params.yml --create-log-groups --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli compose service ps --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli logs --cluster-config $AWS_RESOURCE_NAME_PREFIX --follow --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli compose service scale 2 --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli compose service ps --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX
+}
+
+ecscleanup(){
+    ecs-cli compose service down --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli down --force --cluster-config $AWS_RESOURCE_NAME_PREFIX
 }
 
 installnodepend
@@ -70,3 +70,4 @@ installecs
 pushtoecr
 ecsconfigure
 ecsdeploy
+ecscleanup
