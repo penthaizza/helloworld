@@ -50,7 +50,7 @@ ecsconfigure(){
  
 ecsdeploy(){
     ecs-cli up --force
-    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service up --file docker-compose.yml --ecs-params ecs-params.yml --create-log-groups --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service up --create-log-groups --cluster-config $AWS_RESOURCE_NAME_PREFIX
     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
     ecs-cli logs --cluster-config $AWS_RESOURCE_NAME_PREFIX --follow --cluster-config $AWS_RESOURCE_NAME_PREFIX
     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX service scale 2
