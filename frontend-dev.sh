@@ -44,18 +44,18 @@ pushtoecr(){
 
 ecsconfigure(){
     echo "Configure the Amazon ECS CLI"
-    ecs-cli configure --cluster vonder --region $AWS_DEFAULT_REGION --default-launch-type FARGATE --config-name vonder
-    ecs-cli configure profile --access-key $AWS_ACCESS_KEY_ID --secret-key $AWS_SECRET_ACCESS_KEY --profile-name vonder
+    ecs-cli configure --cluster $AWS_RESOURCE_NAME_PREFIX --region $AWS_DEFAULT_REGION --default-launch-type FARGATE --config-name $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli configure profile --access-key $AWS_ACCESS_KEY_ID --secret-key $AWS_SECRET_ACCESS_KEY --profile-name $AWS_RESOURCE_NAME_PREFIX
     ecs-cli up
-    ecs-cli compose --project-name vonder service up --create-log-groups --cluster-config vonder
-    ecs-cli compose --project-name vonder service ps --cluster-config vonder
-    ecs-cli logs --cluster-config vonder --follow --cluster-config vonder
-    ecs-cli compose --project-name vonder service scale 2 --cluster-config vonder
-    ecs-cli compose --project-name vonder service ps --cluster-config vonder
+    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service up --create-log-groups --cluster-config $AWS_RESOURCE_NAME_PREFIX --force
+    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli logs --cluster-config $AWS_RESOURCE_NAME_PREFIX --follow --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service scale 2 --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
 }
  
 ecsdeploy(){
-    ecs-cli compose up --create-log-groups --cluster-config vonder
+    ecs-cli compose up --create-log-groups --cluster-config $AWS_RESOURCE_NAME_PREFIX
     ecs-cli ps
 }
 
