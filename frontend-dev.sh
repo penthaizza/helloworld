@@ -44,11 +44,16 @@ pushtoecr(){
 
 ecsconfigure(){
     echo "Configure the Amazon ECS CLI"
-    ecs-cli configure --cluster vonder --region $AWS_DEFAULT_REGION --default-launch-type EC2 --config-name vonder
-    ecs-cli up --keypair mongoatlas --capability-iam --size 2 --instance-type t2.micro --cluster-config vonder --force
-    ecs-cli compose up --create-log-groups --cluster-config vonder
+    ecs-cli configure --cluster vonder --region $AWS_DEFAULT_REGION --default-launch-type FARGATE --config-name vonder
+    ecs-cli configure profile --access-key $AWS_ACCESS_KEY_ID --secret-key $AWS_SECRET_ACCESS_KEY --profile-name vonder
+    ecs-cli up
+    ecs-cli compose --project-name vonder service up --create-log-groups --cluster-config vonder
+    ecs-cli compose --project-name vonder service ps --cluster-config vonder
+    ecs-cli logs --cluster-config vonder --follow --cluster-config vonder
+    ecs-cli compose --project-name vonder service scale 2 --cluster-config vonder
+    ecs-cli compose --project-name vonder service ps --cluster-config vonder
 }
-
+ 
 ecsdeploy(){
     ecs-cli compose up --create-log-groups --cluster-config vonder
     ecs-cli ps
