@@ -57,10 +57,10 @@ ecsdeploy(){
     ecs-cli compose service ps --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX
 }
 
-ecscleanup(){
-    ecs-cli compose service down --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli down --force --cluster-config $AWS_RESOURCE_NAME_PREFIX
-}
+# ecscleanup(){
+#     ecs-cli compose service down --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX
+#     ecs-cli down --force --cluster-config $AWS_RESOURCE_NAME_PREFIX
+# }
 
 installnodepend
 installaws
@@ -70,4 +70,4 @@ installecs
 pushtoecr
 ecsconfigure
 ecsdeploy
-ecscleanup
+# ecscleanup
