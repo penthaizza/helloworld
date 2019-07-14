@@ -1,0 +1,28 @@
+version: '2'
+services:
+  wordpress:
+    image: wordpress
+    cpu_shares: 100
+    mem_limit: 524288000
+    ports:
+      - "80:80"
+    links:
+      - mysql
+    logging:
+      driver: awslogs
+      options: 
+        awslogs-group: tutorial-wordpress
+        awslogs-region: $AWS_DEFAULT_REGION
+        awslogs-stream-prefix: wordpress
+  mysql:
+    image: mysql:5.7
+    cpu_shares: 100
+    mem_limit: 524288000
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    logging:
+      driver: awslogs
+      options: 
+        awslogs-group: tutorial-mysql
+        awslogs-region: $AWS_DEFAULT_REGION
+        awslogs-stream-prefix: mysql
