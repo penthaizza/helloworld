@@ -60,3 +60,5 @@ installdocker
 setawsenv
 installecs
 pushtoecr
+ecsconfigure
+ecsdeploy
