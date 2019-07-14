@@ -52,6 +52,8 @@ ecsconfigure(){
     ecs-cli logs --cluster-config $AWS_RESOURCE_NAME_PREFIX --follow --cluster-config $AWS_RESOURCE_NAME_PREFIX
     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service scale 2 --cluster-config $AWS_RESOURCE_NAME_PREFIX
     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service down --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli down --force --cluster-config $AWS_RESOURCE_NAME_PREFIX
 }
  
 ecsdeploy(){
