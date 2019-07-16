@@ -59,7 +59,7 @@ prepareecs(){
 launchecs(){
     ecs-cli compose \
         --project-name helloworld service up \
-        --target-group-arn arn:aws:elasticloadbalancing:ap-southeast-1:871468375256:loadbalancer/app/ELB-Helloworld/d1913740f3ed5b20 \
+        --target-group-arn arn:aws:elasticloadbalancing:ap-southeast-1:871468375256:targetgroup/helloworldecs/0cebdbecacd0699a \
         --container-name helloworld \
         --container-port 80 \
         --create-log-groups \
