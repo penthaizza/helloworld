@@ -42,6 +42,14 @@ pushtoecr(){
     docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX
 }
 
+cleanup(){
+    echo "Cleanup all stack"
+    ecs-cli compose --project-name ecsdemo-frontend service rm --delete-namespace --cluster-config ecscleanup-demo
+    aws cloudformation delete-stack --stack-name ecs-demo-alb
+    aws cloudformation wait stack-delete-complete --stack-name ecs-demo-alb
+    aws cloudformation delete-stack --stack-name ecs-demo
+}
+
 createenv(){
     aws cloudformation deploy --stack-name ecs-demo --template-file private-vpc.yml --capabilities CAPABILITY_IAM
     aws cloudformation deploy --stack-name ecs-demo-alb --template-file alb-external.yml
@@ -93,13 +101,6 @@ scaletasks(){
         --cluster-config ecs-demo   
 }
 
-cleanup(){
-    echo "Cleanup all stack"
-    ecs-cli compose --project-name ecsdemo-frontend service rm --delete-namespace --cluster-config ecscleanup-demo
-    aws cloudformation delete-stack --stack-name ecs-demo-alb
-    aws cloudformation wait stack-delete-complete --stack-name ecs-demo-alb
-    aws cloudformation delete-stack --stack-name ecs-demo
-}
 
 installnodepend
 installaws
@@ -107,27 +108,10 @@ installdocker
 setawsenv
 installecs
 pushtoecr
+cleanup
 createenv
 setenv
 ecsconfigure
 authorizetraffic
 ecsdeploy
 scaletasks
-
-# ecsdeploy(){
-#     ecs-cli up --force
-#     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service up --create-log-groups --cluster-config $AWS_RESOURCE_NAME_PREFIX
-#     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
-#     ecs-cli logs --cluster-config $AWS_RESOURCE_NAME_PREFIX --follow --cluster-config $AWS_RESOURCE_NAME_PREFIX
-#     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX service scale 2
-#     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
-# }
-
-# ecscleanup(){
-#     ecs-cli compose service down --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX
-#     ecs-cli down --force --cluster-config $AWS_RESOURCE_NAME_PREFIX
-# }
-
-# ecsconfigure
-# ecsdeploy
-# ecscleanup

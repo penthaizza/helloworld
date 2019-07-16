@@ -4,7 +4,7 @@ nodeimage: &nodeimage
 dependencies: &dependencies
   run:
     name: Add Dependencies
-    command: apk add --no-cache --update curl git python py-pip
+    command: apk add --no-cache --update curl git python py-pip jq
 
 version: 2.1
 jobs:
