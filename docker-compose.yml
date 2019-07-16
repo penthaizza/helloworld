@@ -1,12 +1,12 @@
 version: '3'
 services:
-  ecsdemo-frontend:
+  $AWS_RESOURCE_NAME_PREFIX:
     image: amazon/amazon-ecs-sample
     ports:
       - "80:80"
     logging:
       driver: awslogs
       options: 
-        awslogs-group: helloworld
+        awslogs-group: $AWS_RESOURCE_NAME_PREFIX
         awslogs-region: $AWS_DEFAULT_REGION
-        awslogs-stream-prefix: helloworld
+        awslogs-stream-prefix: $AWS_RESOURCE_NAME_PREFIX

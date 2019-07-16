@@ -64,11 +64,13 @@ prepareecs(){
 launchecs(){
     echo "Deploy ECS Fargate"
     ecs-cli compose \
-        --project-name helloworld service up \
+        --project-name $AWS_RESOURCE_NAME_PREFIX service up \
         --target-group-arn arn:aws:elasticloadbalancing:ap-southeast-1:871468375256:targetgroup/helloworldecs/0cebdbecacd0699a \
+        --container-name $AWS_RESOURCE_NAME_PREFIX \
         --container-port 80 \
         --create-log-groups \
-        --cluster-config helloworld \
+        --cluster-config $AWS_RESOURCE_NAME_PREFIX \
+        --vpc vpc-040b8e45563258b1f
     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX ps \
         --cluster-config $AWS_RESOURCE_NAME_PREFIX
 }
