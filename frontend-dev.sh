@@ -53,7 +53,7 @@ prepareecs(){
         --profile-name helloworld \
         --access-key $AWS_ACCESS_KEY_ID \
         --secret-key $AWS_SECRET_ACCESS_KEY
-    ecs-cli up --force
+    # ecs-cli up --force
 }
 
 launchecs(){
@@ -62,7 +62,6 @@ launchecs(){
         --target-group-arn arn:aws:elasticloadbalancing:ap-southeast-1:871468375256:loadbalancer/app/ELB-Helloworld/d1913740f3ed5b20 \
         --container-name helloworld \
         --container-port 80 \
-        --role ecsServiceRole \
         --create-log-groups \
         --cluster-config helloworld \
     ecs-cli compose --project-name helloworld ps \
