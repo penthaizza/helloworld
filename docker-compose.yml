@@ -3,10 +3,10 @@ services:
   ecsdemo-frontend:
     image: amazon/amazon-ecs-sample
     ports:
-      - "3000:3000"
+      - "80:80"
     logging:
       driver: awslogs
       options: 
-        awslogs-group: ecsdemo-frontend
+        awslogs-group: helloworld
         awslogs-region: $AWS_DEFAULT_REGION
-        awslogs-stream-prefix: ecsdemo-frontend
+        awslogs-stream-prefix: helloworld

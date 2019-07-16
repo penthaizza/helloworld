@@ -42,76 +42,34 @@ pushtoecr(){
     docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX
 }
 
-cleanup(){
-    echo "Cleanup all stack"
-    ecs-cli compose --project-name ecsdemo-frontend service rm --delete-namespace --cluster-config ecscleanup-demo
-    aws cloudformation delete-stack --stack-name ecs-demo-alb
-    aws cloudformation wait stack-delete-complete --stack-name ecs-demo-alb
-    aws cloudformation delete-stack --stack-name ecs-demo
+prepareecs(){
+    echo "Prepare a Fargate launch"
+    ecs-cli configure \
+        --cluster helloworld \
+        --region $AWS_DEFAULT_REGION \
+        --default-launch-type FARGATE \
+        --config-name helloworld
+    ecs-cli configure profile \
+        --profile-name helloworld \
+        --access-key $AWS_ACCESS_KEY_ID \
+        --secret-key $AWS_SECRET_ACCESS_KEY
+    ecs-cli up --force
 }
 
-createenv(){
-    aws cloudformation deploy --stack-name ecs-demo --template-file private-vpc.yml --capabilities CAPABILITY_IAM
-    aws cloudformation deploy --stack-name ecs-demo-alb --template-file alb-external.yml
-}
-
-setenv(){
-    export clustername=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`ClusterName`].OutputValue' --output text)
-    export target_group_arn=$(aws cloudformation describe-stack-resources --stack-name ecs-demo-alb | jq -r '.[][] | select(.ResourceType=="AWS::ElasticLoadBalancingV2::TargetGroup").PhysicalResourceId')
-    export vpc=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`VpcId`].OutputValue' --output text)
-    export ecsTaskExecutionRole=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`ECSTaskExecutionRole`].OutputValue' --output text)
-    export subnet_1=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`PrivateSubnetOne`].OutputValue' --output text)
-    export subnet_2=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`PrivateSubnetTwo`].OutputValue' --output text)
-    export subnet_3=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`PrivateSubnetThree`].OutputValue' --output text)
-    export security_group=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`ContainerSecurityGroup`].OutputValue' --output text)
-}
-
-ecsconfigure(){
-    echo "Configure the Amazon ECS CLI"
-    ecs-cli configure --region $AWS_DEFAULT_REGION --cluster ecs-demo --default-launch-type FARGATE --config-name ecs-demo
-}
-
-authorizetraffic(){
-    echo "Authorize traffic"
-    aws ec2 authorize-security-group-ingress --group-id "$security_group" --protocol tcp --port 3000 --cidr 0.0.0.0/0
-}
- 
-ecsdeploy(){
-    echo "Deploy and View running container"
-    ecs-cli compose --project-name ecsdemo-frontend service up \
+launchecs(){
+    ecs-cli compose \
+        --project-name helloworld service up \
         --create-log-groups \
-        --target-group-arn $target_group_arn \
-        --private-dns-namespace service \
-        --enable-service-discovery \
-        --container-name ecsdemo-frontend \
-        --container-port 3000 \
-        --cluster-config ecs-demo \
-        --vpc $vpc
-    ecs-cli compose --project-name ecsdemo-frontend service ps \
-        --cluster-config ecs-demo
-    alb_url=$(aws cloudformation describe-stacks --stack-name ecs-demo-alb --query 'Stacks[0].Outputs[?OutputKey==`ExternalUrl`].OutputValue' --output text)
-    echo "Open $alb_url in your browser"
+        --cluster-config helloworld \
+    ecs-cli compose --project-name helloworld ps \
+        --cluster-config helloworld
 }
-
-scaletasks(){
-    echo "Scale container"
-    ecs-cli compose --project-name ecsdemo-frontend service scale 3 \
-        --cluster-config ecs-demo
-    ecs-cli compose --project-name ecsdemo-frontend service ps \
-        --cluster-config ecs-demo   
-}
-
 
 installnodepend
 installaws
 installdocker
 setawsenv
 installecs
-# pushtoecr
-cleanup
-# createenv
-# setenv
-# ecsconfigure
-# authorizetraffic
-# ecsdeploy
-# scaletasks
+pushtoecr
+prepareecs
+launchecs
