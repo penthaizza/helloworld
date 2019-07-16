@@ -1,6 +1,6 @@
 version: '3'
 services:
-  $AWS_RESOURCE_NAME_PREFIX:
+  helloworld:
     image: amazon/amazon-ecs-sample
     ports:
       - "80:80"
