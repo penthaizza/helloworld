@@ -63,7 +63,7 @@ prepareecs(){
 
 cleanupecs(){
     echo "Clear Old Container"
-    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service rm --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service rm --timeout 10 --cluster-config $AWS_RESOURCE_NAME_PREFIX
 }
 
 # launchecs(){
