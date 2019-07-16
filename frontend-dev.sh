@@ -53,10 +53,16 @@ prepareecs(){
         --profile-name helloworld \
         --access-key $AWS_ACCESS_KEY_ID \
         --secret-key $AWS_SECRET_ACCESS_KEY
-    # ecs-cli up --force
+    ecs-cli up \
+        --launch-type FARGATE \
+        --capability-iam \
+        --vpc vpc-040b8e45563258b1f \
+        --subnets subnet-0497227e6a2579926,subnet-02799b5e316577a3a \
+        --force
 }
 
 launchecs(){
+    echo "Deploy ECS Fargate"
     ecs-cli compose \
         --project-name helloworld service up \
         --target-group-arn arn:aws:elasticloadbalancing:ap-southeast-1:871468375256:targetgroup/helloworldecs/0cebdbecacd0699a \
