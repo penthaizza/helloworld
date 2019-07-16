@@ -61,6 +61,11 @@ prepareecs(){
         --force
 }
 
+cleanupecs(){
+    echo "Clear Old Container"
+    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service rm --cluster-config $AWS_RESOURCE_NAME_PREFIX
+}
+
 launchecs(){
     echo "Deploy ECS Fargate"
     ecs-cli compose \
@@ -73,6 +78,10 @@ launchecs(){
         --vpc vpc-040b8e45563258b1f
     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX ps \
         --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service scale 2 \
+        --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX ps \
+        --cluster-config $AWS_RESOURCE_NAME_PREFIX
 }
 
 installnodepend
@@ -82,4 +91,5 @@ setawsenv
 installecs
 pushtoecr
 prepareecs
+cleanupecs
 launchecs
