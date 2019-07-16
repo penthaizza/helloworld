@@ -37,7 +37,7 @@ installecs(){
 pushtoecr(){
     echo "Build & Push to ECR"
     $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-    docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX:$(git rev-parse --short HEAD) .
+    docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX:$(git rev-parse --short HEAD) -f ./frontend/frontend-dev.Dockerfile ./frontend
     docker tag $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX:$(git rev-parse --short HEAD) $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX:latest
     docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX
 }
@@ -70,6 +70,7 @@ launchecs(){
     echo "Deploy ECS Fargate"
     ecs-cli compose \
         --project-name $AWS_RESOURCE_NAME_PREFIX service up \
+        --timeout 10 \
         --target-group-arn arn:aws:elasticloadbalancing:ap-southeast-1:871468375256:targetgroup/helloworldecs/0cebdbecacd0699a \
         --container-name $AWS_RESOURCE_NAME_PREFIX \
         --container-port 80 \
