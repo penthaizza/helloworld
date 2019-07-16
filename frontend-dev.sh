@@ -42,13 +42,13 @@ pushtoecr(){
     docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX
 }
 
-# cleanup(){
-#     echo "Cleanup all stack"
-#     ecs-cli compose --project-name ecsdemo-frontend service rm --delete-namespace --cluster-config ecscleanup-demo
-#     aws cloudformation delete-stack --stack-name ecs-demo-alb
-#     aws cloudformation wait stack-delete-complete --stack-name ecs-demo-alb
-#     aws cloudformation delete-stack --stack-name ecs-demo
-# }
+cleanup(){
+    echo "Cleanup all stack"
+    ecs-cli compose --project-name ecsdemo-frontend service rm --delete-namespace --cluster-config ecscleanup-demo
+    aws cloudformation delete-stack --stack-name ecs-demo-alb
+    aws cloudformation wait stack-delete-complete --stack-name ecs-demo-alb
+    aws cloudformation delete-stack --stack-name ecs-demo
+}
 
 createenv(){
     aws cloudformation deploy --stack-name ecs-demo --template-file private-vpc.yml --capabilities CAPABILITY_IAM
@@ -107,11 +107,11 @@ installaws
 installdocker
 setawsenv
 installecs
-pushtoecr
-# cleanup
-createenv
-setenv
-ecsconfigure
-authorizetraffic
-ecsdeploy
-scaletasks
+# pushtoecr
+cleanup
+# createenv
+# setenv
+# ecsconfigure
+# authorizetraffic
+# ecsdeploy
+# scaletasks
