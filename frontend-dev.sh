@@ -45,12 +45,12 @@ pushtoecr(){
 prepareecs(){
     echo "Prepare a Fargate launch"
     ecs-cli configure \
-        --cluster helloworld \
+        --cluster $AWS_RESOURCE_NAME_PREFIX \
         --region $AWS_DEFAULT_REGION \
         --default-launch-type FARGATE \
-        --config-name helloworld
+        --config-name $AWS_RESOURCE_NAME_PREFIX
     ecs-cli configure profile \
-        --profile-name helloworld \
+        --profile-name $AWS_RESOURCE_NAME_PREFIX \
         --access-key $AWS_ACCESS_KEY_ID \
         --secret-key $AWS_SECRET_ACCESS_KEY
     ecs-cli up \
@@ -66,12 +66,12 @@ launchecs(){
     ecs-cli compose \
         --project-name helloworld service up \
         --target-group-arn arn:aws:elasticloadbalancing:ap-southeast-1:871468375256:targetgroup/helloworldecs/0cebdbecacd0699a \
-        --container-name helloworld \
+        --container-name testhelloworld \
         --container-port 80 \
         --create-log-groups \
         --cluster-config helloworld \
-    ecs-cli compose --project-name helloworld ps \
-        --cluster-config helloworld
+    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX ps \
+        --cluster-config $AWS_RESOURCE_NAME_PREFIX
 }
 
 installnodepend
