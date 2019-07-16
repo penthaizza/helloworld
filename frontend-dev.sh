@@ -42,25 +42,64 @@ pushtoecr(){
     docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$AWS_RESOURCE_NAME_PREFIX
 }
 
+createenv(){
+    aws cloudformation deploy --stack-name ecs-demo --template-file private-vpc.yml --capabilities CAPABILITY_IAM
+    aws cloudformation deploy --stack-name ecs-demo-alb --template-file alb-external.yml
+}
+
+setenv(){
+    export clustername=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`ClusterName`].OutputValue' --output text)
+    export target_group_arn=$(aws cloudformation describe-stack-resources --stack-name ecs-demo-alb | jq -r '.[][] | select(.ResourceType=="AWS::ElasticLoadBalancingV2::TargetGroup").PhysicalResourceId')
+    export vpc=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`VpcId`].OutputValue' --output text)
+    export ecsTaskExecutionRole=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`ECSTaskExecutionRole`].OutputValue' --output text)
+    export subnet_1=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`PrivateSubnetOne`].OutputValue' --output text)
+    export subnet_2=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`PrivateSubnetTwo`].OutputValue' --output text)
+    export subnet_3=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`PrivateSubnetThree`].OutputValue' --output text)
+    export security_group=$(aws cloudformation describe-stacks --stack-name ecs-demo --query 'Stacks[0].Outputs[?OutputKey==`ContainerSecurityGroup`].OutputValue' --output text)
+}
+
 ecsconfigure(){
     echo "Configure the Amazon ECS CLI"
-    ecs-cli configure --cluster $AWS_RESOURCE_NAME_PREFIX --region $AWS_DEFAULT_REGION --default-launch-type FARGATE --config-name $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli configure profile --access-key $AWS_ACCESS_KEY_ID --secret-key $AWS_SECRET_ACCESS_KEY --profile-name $AWS_RESOURCE_NAME_PREFIX
+    ecs-cli configure --region $AWS_DEFAULT_REGION --cluster ecs-demo --default-launch-type FARGATE --config-name ecs-demo
+}
+
+authorizetraffic(){
+    echo "Authorize traffic"
+    aws ec2 authorize-security-group-ingress --group-id "$security_group" --protocol tcp --port 3000 --cidr 0.0.0.0/0
 }
  
 ecsdeploy(){
-    ecs-cli up --force
-    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service up --create-log-groups --cluster-config $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli logs --cluster-config $AWS_RESOURCE_NAME_PREFIX --follow --cluster-config $AWS_RESOURCE_NAME_PREFIX
-    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX service scale 2
-    ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
+    echo "Deploy and View running container"
+    ecs-cli compose --project-name ecsdemo-frontend service up \
+        --create-log-groups \
+        --target-group-arn $target_group_arn \
+        --private-dns-namespace service \
+        --enable-service-discovery \
+        --container-name ecsdemo-frontend \
+        --container-port 3000 \
+        --cluster-config ecs-demo \
+        --vpc $vpc
+    ecs-cli compose --project-name ecsdemo-frontend service ps \
+        --cluster-config ecs-demo
+    alb_url=$(aws cloudformation describe-stacks --stack-name ecs-demo-alb --query 'Stacks[0].Outputs[?OutputKey==`ExternalUrl`].OutputValue' --output text)
+    echo "Open $alb_url in your browser"
 }
 
-# ecscleanup(){
-#     ecs-cli compose service down --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX
-#     ecs-cli down --force --cluster-config $AWS_RESOURCE_NAME_PREFIX
-# }
+scaletasks(){
+    echo "Scale container"
+    ecs-cli compose --project-name ecsdemo-frontend service scale 3 \
+        --cluster-config ecs-demo
+    ecs-cli compose --project-name ecsdemo-frontend service ps \
+        --cluster-config ecs-demo   
+}
+
+cleanup(){
+    echo "Cleanup all stack"
+    ecs-cli compose --project-name ecsdemo-frontend service rm --delete-namespace --cluster-config ecscleanup-demo
+    aws cloudformation delete-stack --stack-name ecs-demo-alb
+    aws cloudformation wait stack-delete-complete --stack-name ecs-demo-alb
+    aws cloudformation delete-stack --stack-name ecs-demo
+}
 
 installnodepend
 installaws
@@ -68,6 +107,27 @@ installdocker
 setawsenv
 installecs
 pushtoecr
+createenv
+setenv
 ecsconfigure
+authorizetraffic
 ecsdeploy
+scaletasks
+
+# ecsdeploy(){
+#     ecs-cli up --force
+#     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service up --create-log-groups --cluster-config $AWS_RESOURCE_NAME_PREFIX
+#     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
+#     ecs-cli logs --cluster-config $AWS_RESOURCE_NAME_PREFIX --follow --cluster-config $AWS_RESOURCE_NAME_PREFIX
+#     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX service scale 2
+#     ecs-cli compose --project-name $AWS_RESOURCE_NAME_PREFIX service ps --cluster-config $AWS_RESOURCE_NAME_PREFIX
+# }
+
+# ecscleanup(){
+#     ecs-cli compose service down --project-name $AWS_RESOURCE_NAME_PREFIX --cluster-config $AWS_RESOURCE_NAME_PREFIX
+#     ecs-cli down --force --cluster-config $AWS_RESOURCE_NAME_PREFIX
+# }
+
+# ecsconfigure
+# ecsdeploy
 # ecscleanup
