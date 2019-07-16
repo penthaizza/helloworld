@@ -2,7 +2,7 @@ version: '3'
 services:
   helloworld:
     # image: amazon/amazon-ecs-sample
-    image: nignx:latest
+    image: nginx:latest
     ports:
       - "3000:3000"
     logging:
